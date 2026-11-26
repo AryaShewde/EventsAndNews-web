@@ -16,7 +16,7 @@ const Login = () => {
         dispatch({ type: "LOGIN_START" });
 
         try {
-            const res = await axios.post('https://ean-be-updated.vercel.app/api/auth/login', {
+            const res = await axios.post('https://events-and-news-web-backend.vercel.app/api/auth/login', {
                 username: userRef.current.value,
                 password: passwordRef.current.value,
             });

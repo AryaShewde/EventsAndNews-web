@@ -19,6 +19,32 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    bio: {
+        type: String,
+        default: ""
+    },
+    Instagram: {
+        type: String,
+        default: ""
+    },
+    Twitter: {
+        type: String,
+        default: ""
+    },
+    LinkedIn: {
+        type: String,
+        default: ""
+    },
+    Facebook: {
+        type: String,
+        default: ""
+    },
+    savedPosts: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Post'
+        }
+    ]
 
 }, { timestamps: true })
 

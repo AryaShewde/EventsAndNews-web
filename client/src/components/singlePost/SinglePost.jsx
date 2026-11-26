@@ -8,17 +8,24 @@ import { useNavigate } from 'react-router-dom';
 import { IoMdArrowRoundBack } from "react-icons/io";
 import ReactQuill from "react-quill"
 import "react-quill/dist/quill.snow.css";
+import Loading from '../../pages/loading/Loading'
 
 const SinglePost = () => {
     const navigate = useNavigate();
     const { user } = useContext(Context)
-    // const PF = "https://eventsandnewsapi.onrender.com/images/"
     const location = useLocation()
     const path = location.pathname.split("/")[2];
     const [post, setPost] = useState({})
     const [title, setTitle] = useState("");
     const [desc, setDesc] = useState("");
     const [updateMode, setUpdateMode] = useState(false);
+    const [likes, setLikes] = useState([]);
+    const [saves, setSaves] = useState([]);
+    const [likeloading, setLikeLoading] = useState(false);
+    const [saveloading, setSaveLoading] = useState(false);
+    const [pageLoading, setPageLoading] = useState(true);
+    const likeStatus = user ? likes.includes(user._id) : false;
+    const saveStatus = user ? saves.includes(post._id) : false;
     const handleEditorChange = (content) => {
         setDesc(content);
     };
@@ -29,17 +36,35 @@ const SinglePost = () => {
 
     useEffect(() => {
         const getPost = async () => {
-            const res = await axios.get("https://ean-be-updated.vercel.app/api/posts/" + path);
-            setPost(res.data)
-            setTitle(res.data.title);
-            setDesc(res.data.desc);
+            setPageLoading(true);
+            try {
+                const res = await axios.get("https://events-and-news-web-backend.vercel.app/api/posts/" + path);
+                setPost(res.data);
+                setTitle(res.data.title);
+                setDesc(res.data.desc);
+                setLikes(res.data.likes || []);
+            } finally {
+                setPageLoading(false);
+            }
         }
         getPost();
     }, [path])
 
+    useEffect(() => {
+        const getSavedposts = async () => {
+            try {
+                const res = await axios.get("https://events-and-news-web-backend.vercel.app/api/post/save/" + user._id);
+                setSaves(res.data || []);
+            }catch (error){
+                console.log(error)
+            }
+        }
+        getSavedposts();
+    }, [user])
+
     const handleDelete = async () => {
         try {
-            await axios.delete(`https://ean-be-updated.vercel.app/api/posts/${post._id}`, {
+            await axios.delete(`https://events-and-news-web-backend.vercel.app/api/posts/${post._id}`, {
                 data: { username: user.username }
             });
             window.location.replace("/");
@@ -47,12 +72,51 @@ const SinglePost = () => {
     }
     const handleUpdate = async () => {
         try {
-            await axios.put(`https://ean-be-updated.vercel.app/api/posts/${post._id}`, {
+            await axios.put(`https://events-and-news-web-backend.vercel.app/api/posts/${post._id}`, {
                 username: user.username, title, desc
             });
             setUpdateMode(false)
             window.location.replace("/");
         } catch (error) { }
+    }
+
+    const handleLikeStatus = async () => {
+        if (likeloading || !user) return;
+        setLikeLoading(true);
+        try {
+            await axios.put(`https://events-and-news-web-backend.vercel.app/api/post/like/${post._id}`, {
+                _id: user._id
+            });
+            setLikes((prev) =>
+                likeStatus ? prev.filter((id) => id !== user._id) : [...prev, user._id]
+            );
+            setLikeLoading(false);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLikeLoading(false);
+        }
+    }
+
+    const handleSaveStatus = async () => {
+        if (saveloading || !user) return;
+        setSaveLoading(true);
+        try {
+            await axios.put(`https://events-and-news-web-backend.vercel.app/api/post/save/${post._id}`, {
+                _id: user._id
+            });
+            setSaves((prev) =>
+                saveStatus ? prev.filter((id) => id !== post._id) : [...prev, post._id]
+            );
+            setSaveLoading(false);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setSaveLoading(false);
+        }
+    }
+    if (pageLoading) {
+        return <Loading />;
     }
 
     return (
@@ -66,6 +130,16 @@ const SinglePost = () => {
                     {
                         updateMode ? (<input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className='singlePostTitleInput' autoFocus />) : (
                             <h1 className="singlePostTitle">
+                                {user && (
+                                    <>
+                                        <div className='like' onClick={handleLikeStatus}>
+                                            {likeloading ? "..." : `${likeStatus ? '❤️' : '🤍'} ${likes.length}`}
+                                        </div>
+                                        <div className='like' onClick={handleSaveStatus}>
+                                            {saveloading ? "..." : `${saveStatus ? '⛊' : '⛉'}`}
+                                        </div>
+                                    </>
+                                )}
                                 {title}
                                 {post.username === user?.username && (
                                     <div className="singlePostEdit">

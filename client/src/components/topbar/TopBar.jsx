@@ -47,6 +47,12 @@ const TopBar = () => {
                     <li className='topListItem topbaritemname4'>
                         <Link to="/write" style={{ textDecoration: "none", color: "inherit" }}>Write</Link>
                     </li>
+                    {
+                        user &&
+                        <li className='topListItem topbaritemname4'>
+                            <Link to="/save" style={{ textDecoration: "none", color: "inherit" }}>Saves</Link>
+                        </li>
+                    }
                     <li className='topListItem topbaritemname5' onClick={handleLogout}>
                         {user && "Logout"}
                     </li>

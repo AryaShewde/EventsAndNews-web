@@ -2,6 +2,7 @@ import TopBar from './components/topbar/TopBar.jsx';
 import Home from './pages/home/Home.jsx';
 import Register from './pages/register/Register.jsx';
 import Login from './pages/login/Login.jsx';
+import Save from './pages/save/Save.jsx';
 import Write from './pages/write/Write.jsx';
 import Settings from './pages/settings/Settings.jsx';
 import Single from './pages/single/Single.jsx';
@@ -53,6 +54,9 @@ function App() {
         </Routes>
         <Routes>
           <Route exact path="/register" element={user ? <Home /> : <Register />} />
+        </Routes>
+        <Routes>
+          <Route exact path="/save" element={user ? <Save /> : <Home />} />
         </Routes>
         <Routes>
           <Route exact path="/login" element={user ? <Home /> : <Login />} />

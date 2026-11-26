@@ -146,6 +146,13 @@
 .writeText{
     font-size: 20px;
 }
+.like{
+    cursor: pointer;
+}
+.screenload{
+    margin: auto;
+    font-size: 50px;
+}
 @media screen and (max-width: 800px) {
     .singlePostWrapper {
         padding: 15px;

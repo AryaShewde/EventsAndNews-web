@@ -16,7 +16,7 @@ const Sidebar = () => {
       //   }
       // });
       // await res.json();
-      const res = await axios.get("https://ean-be-updated.vercel.app/api/category")
+      const res = await axios.get("https://events-and-news-web-backend.vercel.app/api/category")
       setCats(res.data)
     };
     getCats();

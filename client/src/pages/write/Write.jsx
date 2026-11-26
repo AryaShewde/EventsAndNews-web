@@ -31,14 +31,15 @@ const Write = () => {
             data.append("desc", desc);
             // newPost.photo = filename;
             try {
-                await axios.post("https://ean-be-updated.vercel.app/api/upload", data);
+                // await axios.post("https://ean-be-updated.vercel.app/api/upload", data);
+                await axios.post("https://events-and-news-web-backend.vercel.app/api/upload", data);
             } catch (error) {
 
             }
         }
         else {
             try {
-                await axios.post('https://ean-be-updated.vercel.app/api/posts', newPost);
+                await axios.post('https://events-and-news-web-backend.vercel.app/api/posts', newPost);
                 window.location.replace("/");
             } catch (error) {
 

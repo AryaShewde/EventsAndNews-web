@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import "./home.css"
 import Header from '../../components/header/Header'
 import Posts from '../../components/posts/Posts'
@@ -6,12 +6,15 @@ import axios from "axios"
 import { useLocation } from 'react-router-dom'
 import Loading from '../loading/Loading.jsx'
 import Footer from '../../components/footer/Footer.jsx'
+import { Context } from '../../context/Context.js'
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
+  const { user } = useContext(Context)
   const { search } = useLocation();
   const [loading, setLoading] = useState(true);
   const [visiblePosts, setVisiblePosts] = useState([]);
+  const [getsavedata, setGetsavedata] = useState([]);
   const [lazyLoading, setLazyLoading] = useState(false);
   const postsPerLoad = 3;  
 
@@ -24,13 +27,17 @@ const Home = () => {
       //   }
       // });
       // await res.json();
-      const res = await axios.get("https://ean-be-updated.vercel.app/api/posts" + search)
+      const res = await axios.get("https://events-and-news-web-backend.vercel.app/api/posts" + search)
+      if(user){
+        const res2 = await axios.get("https://events-and-news-web-backend.vercel.app/api/post/save/" + user._id);
+        setGetsavedata(res2.data || []);
+      }
       setPosts(res.data)
       setVisiblePosts(res.data.slice(0, postsPerLoad));
       setLoading(false);
     }
     fetchPosts()
-  }, [search])
+  }, [search, user])
 
   const loadMorePosts = () => {
     if (!lazyLoading && visiblePosts.length < posts.length) {
@@ -48,7 +55,7 @@ const Home = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 50) {
+      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 400) {
         loadMorePosts();
       }
     };
@@ -65,8 +72,8 @@ const Home = () => {
           <Loading />
         ) : (
           <div className='allposts'>
-            <Posts posts={visiblePosts} />
-            {lazyLoading && <p className='Lazyloading'>Loading ...</p>}
+            <Posts posts={visiblePosts} getsavedata={getsavedata} />
+            {lazyLoading && <p className='Lazyloading'><Loading /></p>}
           </div>
         )}
       </div>

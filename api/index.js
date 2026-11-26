@@ -5,6 +5,9 @@ const mongoose = require("mongoose")
 const authRoute = require("./routes/auth.js")
 const userRoute = require("./routes/users.js")
 const postRoute = require("./routes/posts.js")
+const likeRoute = require("./routes/like.js")
+const saveRoute = require("./routes/save.js")
+const savedpostsRoute = require("./routes/savedposts.js")
 const categoryRoute = require("./routes/category.js")
 const multer = require("multer");
 const cors = require('cors')
@@ -90,37 +93,52 @@ app.put("/api/uploading/:id", upload.single("file"), async (req, res) => {
   // const { email } = req.body;
   // const { password } = req.body;
   if (userId === req.params.id) {
-    try {
-      const image = req.file
-      let imageBuffer = image.buffer;
-      const sizeInKB = image.size / 1024;
-      const maxSizeInKB = 424; // 0.4MB
-      if (sizeInKB > maxSizeInKB) {
-        try {
-          imageBuffer = await sharp(imageBuffer)
-            .resize({ width: 1024 }) // Resize to a maximum width of 1024px (optional)
-            .jpeg({ quality: 70 }) // Adjust quality to reduce file size
-            .toBuffer();
-
-          // Recheck the size after compression
-          const newSizeInKB = imageBuffer.byteLength / 1024;
-          console.log(`Compressed image size: ${newSizeInKB.toFixed(2)} KB`);
-        } catch (error) {
-          return res.status(500).send('Error processing image.');
-        }
+    if (req.body.file) {
+      try {
+        const updateUser = await User.findByIdAndUpdate(
+          req.params.id,
+          {
+            profilePic: req.body.file,
+          },
+          { new: true });
+        res.status(200).json(updateUser)
+      } catch (error) {
+        res.status(500).json(error);
       }
-      const imageBase64 = imageBuffer.toString('base64');
-      const imageUrl = `data:${req.file.mimetype};base64,${imageBase64}`;
+    }
+    else {
+      try {
+        const image = req.file
+        let imageBuffer = image.buffer;
+        const sizeInKB = image.size / 1024;
+        const maxSizeInKB = 424; // 0.4MB
+        if (sizeInKB > maxSizeInKB) {
+          try {
+            imageBuffer = await sharp(imageBuffer)
+              .resize({ width: 1024 }) // Resize to a maximum width of 1024px (optional)
+              .jpeg({ quality: 70 }) // Adjust quality to reduce file size
+              .toBuffer();
 
-      const updateUser = await User.findByIdAndUpdate(
-        req.params.id,
-        {
-          profilePic: imageUrl,
-        },
-        { new: true });
-      res.status(200).json(updateUser)
-    } catch (error) {
-      res.status(500).json(error);
+            // Recheck the size after compression
+            const newSizeInKB = imageBuffer.byteLength / 1024;
+            console.log(`Compressed image size: ${newSizeInKB.toFixed(2)} KB`);
+          } catch (error) {
+            return res.status(500).send('Error processing image.');
+          }
+        }
+        const imageBase64 = imageBuffer.toString('base64');
+        const imageUrl = `data:${req.file.mimetype};base64,${imageBase64}`;
+
+        const updateUser = await User.findByIdAndUpdate(
+          req.params.id,
+          {
+            profilePic: imageUrl,
+          },
+          { new: true });
+        res.status(200).json(updateUser)
+      } catch (error) {
+        res.status(500).json(error);
+      }
     }
   }
   else {
@@ -131,6 +149,9 @@ app.put("/api/uploading/:id", upload.single("file"), async (req, res) => {
 app.use("/api/auth", authRoute)
 app.use("/api/users", userRoute)
 app.use("/api/posts", postRoute)
+app.use("/api/post/like", likeRoute)
+app.use("/api/post/save", saveRoute)
+app.use("/api/posts/savedposts", savedpostsRoute)
 app.use("/api/category", categoryRoute)
 
 app.listen(port, () => {

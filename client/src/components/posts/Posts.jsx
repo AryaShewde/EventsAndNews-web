@@ -3,7 +3,7 @@ import "./posts.css"
 import Post from '../post/Post'
 import { IoSearchSharp } from "react-icons/io5";
 
-const Posts = ({ posts }) => {
+const Posts = ({ posts, getsavedata }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredPosts, setFilteredPosts] = useState(posts);
 
@@ -47,7 +47,7 @@ const Posts = ({ posts }) => {
         </div>
         <div className='posts'>
           {filteredPosts && filteredPosts.map(p => (
-            <Post key={p._id} post={p} />
+            <Post key={p._id} post={p} getsavedata={getsavedata} />
           ))}
         </div>
       </div>

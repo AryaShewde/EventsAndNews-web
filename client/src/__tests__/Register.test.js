@@ -51,7 +51,7 @@ describe("Register Component", () => {
 
     await waitFor(() => {
       expect(axios.post).toHaveBeenCalledWith(
-        "https://ean-be-updated.vercel.app/api/auth/register",
+        "https://events-and-news-web-backend.vercel.app/api/auth/register",
         { username: "Arya", email: "arya@example.com", password: "123456" }
       );
       expect(window.location.replace).toHaveBeenCalledWith("/login");
